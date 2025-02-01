@@ -8,11 +8,11 @@ use eframe::egui;
 use eframe::epaint::text::TextWrapMode;
 use eframe::epaint::textures::TextureOptions;
 use egui::{
-    Color32, ColorImage, Id, PointerButton, Stroke, TextBuffer, TextureFilter, TextureHandle, Vec2,
+    Color32, ColorImage, Id, PointerButton, Stroke, TextureFilter, TextureHandle, Vec2,
     Vec2b,
 };
 use egui_plot::{
-    Axis, AxisHints, HLine, HPlacement, Plot, PlotImage, PlotItem, PlotPoint, PlotPoints, Polygon,
+    AxisHints, HLine, HPlacement, Plot, PlotImage, PlotItem, PlotPoint, PlotPoints, Polygon,
     VLine, VPlacement,
 };
 use kornia::io::functional::read_image_any;
@@ -20,7 +20,7 @@ use std::cmp::Ordering;
 use std::fs::read_to_string;
 use std::ops::Neg;
 use std::path::PathBuf;
-use std::{cmp, fs};
+use std::fs;
 
 fn main() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -110,7 +110,7 @@ impl eframe::App for MyApp {
             let mut to_del: Option<usize> = None;
             for (idx, img_path) in self.imgs_paths.iter_mut().enumerate() {
                 let name = img_path.file_name().unwrap().to_string_lossy();
-                let mut resp = ui
+                let resp = ui
                     .selectable_value(&mut self.selected_img, Some(img_path.to_path_buf()), name)
                     .on_hover_text(img_path.to_string_lossy());
                 if resp.middle_clicked() {
@@ -176,7 +176,7 @@ impl eframe::App for MyApp {
                 let mut to_del: Option<usize> = None;
                 for (idx, config_path) in self.configs_paths.iter_mut().enumerate() {
                     let name = config_path.file_name().unwrap().to_string_lossy();
-                    let mut resp = ui
+                    let resp = ui
                         .selectable_value(
                             &mut self.selected_config,
                             Some(config_path.to_path_buf()),

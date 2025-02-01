@@ -274,7 +274,7 @@ impl eframe::App for MyApp {
                 if let Some(path) = &self.selected_config {
                     if ui.button("Save current config").clicked() {
                         if let Ok(json_string) = serde_json::to_string(&self.config_data.config) {
-                            if let Ok(_) = fs::write(path, &json_string) {
+                            if fs::write(path, &json_string).is_ok() {
                                 println!("Saved {}", &path.display());
                             } else {
                                 eprintln!("Failed saving {}", &path.display());
@@ -353,7 +353,7 @@ impl eframe::App for MyApp {
                         let [x1, y1, x2, y2] = config
                             .get_abs_plot_coords(img_data.width as f64, img_data.height as f64);
 
-                        if &Some(idx) == &self.config_data.edit_idx {
+                        if Some(idx) == self.config_data.edit_idx {
                             plot_ui.vline(
                                 VLine::new(x1)
                                     .highlight(matches!(self.config_data.edit_coord, EditCoord::X1))
@@ -551,12 +551,12 @@ impl eframe::App for MyApp {
                         let ext = path.extension().and_then(|e| e.to_str());
                         match ext {
                             Some("png") | Some("jpg") | Some("jpeg") => {
-                                if !self.imgs_paths.contains(&path) {
+                                if !self.imgs_paths.contains(path) {
                                     self.imgs_paths.push(path.to_path_buf());
                                 }
                             }
                             Some("json") => {
-                                if !self.configs_paths.contains(&path) {
+                                if !self.configs_paths.contains(path) {
                                     if let Ok(json_string) = read_to_string(path) {
                                         if serde_json::from_str::<Vec<JsonConfig>>(&json_string)
                                             .is_ok()

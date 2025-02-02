@@ -10,7 +10,6 @@ impl RoIApp {
         ctx.input(|i| {
             if !i.raw.dropped_files.is_empty() {
                 for dropped_file in &i.raw.dropped_files {
-                    // TODO: filter the same paths
                     if let Some(path) = &dropped_file.path {
                         let ext = path.extension().and_then(|e| e.to_str());
                         match ext {

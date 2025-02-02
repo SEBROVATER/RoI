@@ -179,7 +179,6 @@ impl RoIApp {
                                 // best_val = val;
                             }
                             self.config_data.edit_coord = best_match;
-                            // TODO: highlight editing coord
                         }
                     }
                 }

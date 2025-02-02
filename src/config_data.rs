@@ -12,14 +12,14 @@ impl ConfigData {
         let mut best_match_idx: Option<usize> = None;
         let mut best_center_dist = f64::MAX;
 
-        for (idx, config) in self.config.iter().enumerate() {
-            if (config.x1..=config.x2).contains(&x) && (config.y1..config.y2).contains(&y) {
-                let (cx, cy) = ((config.x2 + config.x1) / 2.0, (config.y2 + config.y1) / 2.0);
-                let dist = ((cx - x).powi(2) + (cy - y).powi(2)).sqrt();
-                if dist < best_center_dist {
-                    best_center_dist = dist;
-                    best_match_idx = Some(idx);
-                }
+        for (idx, config) in self.config.iter().enumerate().filter(|(_idx, config)| {
+            (config.x1..=config.x2).contains(&x) && (config.y1..config.y2).contains(&y)
+        }) {
+            let [cx, cy] = config.get_center();
+            let dist = (cx - x).powi(2) + (cy - y).powi(2);
+            if dist < best_center_dist {
+                best_center_dist = dist;
+                best_match_idx = Some(idx);
             }
         }
         best_match_idx

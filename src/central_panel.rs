@@ -5,7 +5,6 @@ use egui_plot::{
     AxisHints, HLine, HPlacement, Plot, PlotImage, PlotPoint, PlotPoints, Polygon, VLine,
     VPlacement,
 };
-use std::cmp::Ordering;
 use std::ops::Neg;
 
 impl RoIApp {
@@ -129,38 +128,8 @@ impl RoIApp {
                         let x = img_data.get_rel_config_coord_x1(plot_pos.x);
                         let y = img_data.get_rel_config_coord_y1(plot_pos.y);
 
-                        let mut best_match_idx: Option<usize> = None;
-                        let mut best_center_dist = f64::MAX;
-
-                        for (idx, config) in self.config_data.config.iter().enumerate() {
-                            if (config.x1..=config.x2).contains(&x)
-                                && (config.y1..config.y2).contains(&y)
-                            {
-                                let (cx, cy) =
-                                    ((config.x2 + config.x1) / 2.0, (config.y2 + config.y1) / 2.0);
-                                let dist = ((cx - x).powi(2) + (cy - y).powi(2)).sqrt();
-                                if dist < best_center_dist {
-                                    best_center_dist = dist;
-                                    best_match_idx = Some(idx);
-                                }
-                            }
-                        }
-
-                        if let Some(del_idx) = best_match_idx {
-                            self.config_data.config.remove(del_idx);
-                            if let Some(edit_idx) = self.config_data.edit_idx {
-                                match del_idx.cmp(&edit_idx) {
-                                    Ordering::Less => {
-                                        self.config_data.edit_idx = Some(edit_idx - 1);
-                                        self.config_data.edit_coord = EditCoord::None;
-                                    }
-                                    Ordering::Equal => {
-                                        self.config_data.edit_idx = None;
-                                        self.config_data.edit_coord = EditCoord::None;
-                                    }
-                                    Ordering::Greater => {}
-                                }
-                            }
+                        if let Some(del_idx) = self.config_data.find_relevant_roi_at_coord(x, y) {
+                            self.config_data.safely_remove_roi(del_idx);
                         }
                     }
                 };
@@ -171,22 +140,7 @@ impl RoIApp {
                         let x = img_data.get_rel_config_coord_x1(plot_pos.x);
                         let y = img_data.get_rel_config_coord_y1(plot_pos.y);
 
-                        let mut best_match_idx: Option<usize> = None;
-                        let mut best_center_dist = f64::MAX;
-
-                        for (idx, config) in self.config_data.config.iter().enumerate() {
-                            if (config.x1..=config.x2).contains(&x)
-                                && (config.y1..config.y2).contains(&y)
-                            {
-                                let (cx, cy) =
-                                    ((config.x2 + config.x1) / 2.0, (config.y2 + config.y1) / 2.0);
-                                let dist = ((cx - x).powi(2) + (cy - y).powi(2)).sqrt();
-                                if dist < best_center_dist {
-                                    best_center_dist = dist;
-                                    best_match_idx = Some(idx);
-                                }
-                            }
-                        }
+                        let best_match_idx = self.config_data.find_relevant_roi_at_coord(x, y);
                         if best_match_idx.is_some() {
                             self.config_data.edit_idx = best_match_idx;
                         }

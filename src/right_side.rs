@@ -2,7 +2,6 @@ use crate::app::RoIApp;
 use crate::config::JsonConfig;
 use crate::config_data::EditCoord;
 use egui::TextWrapMode;
-use std::cmp::Ordering;
 use std::fs::read_to_string;
 
 impl RoIApp {
@@ -99,20 +98,7 @@ impl RoIApp {
                                 });
                             }
                             if let Some(del_idx) = to_del {
-                                self.config_data.config.remove(del_idx);
-                                if let Some(edit_idx) = self.config_data.edit_idx {
-                                    match del_idx.cmp(&edit_idx) {
-                                        Ordering::Less => {
-                                            self.config_data.edit_idx = Some(edit_idx - 1);
-                                            self.config_data.edit_coord = EditCoord::None;
-                                        }
-                                        Ordering::Equal => {
-                                            self.config_data.edit_idx = None;
-                                            self.config_data.edit_coord = EditCoord::None;
-                                        }
-                                        Ordering::Greater => {}
-                                    }
-                                }
+                                self.config_data.safely_remove_roi(del_idx);
                             }
                         }
                     }
